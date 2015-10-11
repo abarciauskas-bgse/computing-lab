@@ -1,0 +1,61 @@
+---
+title: "Computing-class2-Notes.Rmd"
+output: html_document
+---
+
+
+# Random Number Generation
+
+**Computer random number generation** looks random but is deterministic.
+
+U ~ Unif(0,1)
+f(x) { 1 if 0 < x < 1; 0 otherwise }
+
+After generating number from uniform distribution, does:
+
+* inversion
+* transformation
+* rejection sampling
+
+```{r}
+# Linear Congruential Generator
+
+# Tuning parameters
+a = 48271
+c = 0
+m = 2^31 -1
+
+linear_congurential_generator <- function(seednum, ndraws) {
+  S <- ndraws
+  x <- rep(0,S)
+  u <- rep(0,S)
+
+  x[1] <- seednum
+  for(s in 2:S) {
+    x[s] <- (a*x[s-1]) %% m
+  }
+
+  x/m
+}
+
+randnums <- linear_congurential_generator(12345, 1000)
+randnums2 <- linear_congurential_generator(12345, 1000)
+
+plot(randnums)
+hist(randnums,freq=FALSE)
+abline(1, 0, col = 'blue', lwd = 3)
+
+```
+
+R's built-in version
+
+```{r}
+runif(1)
+
+# Can set the seed to replicate exactly a random experiment
+set.seed(12345)
+runif(1)
+# Same as
+set.seed(12345)
+runif(1)
+```
