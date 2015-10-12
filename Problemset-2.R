@@ -1,9 +1,10 @@
-  # Tuning parameters for Linear Congruential Generator
+# Tuning parameters for Linear Congruential Generator
 a = 48271
 m = 2^31 - 1
 c = 1
 
 # Linear Congruential Random Number Generator
+# Simulates draws from a uniform random variable
 #
 # The function requires two arguments (in this order):
 #   1) `n`: the number of draws, and
@@ -11,20 +12,19 @@ c = 1
 #
 # The function returns a vector containing `n` uniform draws.
 #
-congruential.generator <- function(n, seedval) {
-  S <- n
-  x <- rep(0,S)
-  u <- rep(0,S)
+# Example:
+# congruential.generator(10, 12345)
+#
+congruential.generator <- function(n, seed) {
+  x <- rep(0,n+1)
+  x[1] <- seed
 
-  x[1] <- seedval
-
-  for(s in 2:S) {
-    x[s] <- (a*x[s-1]) %% m
+  for(s in 2:(n+1)) {
+    x[s] <- (a*x[s-1] + c) %% m
   }
 
-  x/m
+  x[2:(n+1)]/m
 }
-
 
 # Normal Random Number Generator
 # Simulate draws from a normal random variable using the Box–Muller algorithm.
@@ -50,7 +50,7 @@ normal.simulator <- function(u, m, d) {
     u1 <- u[position]
     u2 <- u[position+1]
 
-    z1 <- sqrt(-2 * log(u1)) * cos(2 * pi * u2)
+    z1 <- sqrt(-2 * log(u2)) * cos(2 * pi * u1)
     z2 <- sqrt(-2 * log(u2)) * sin(2 * pi * u1)
 
     # Project to general normal with mean m and standard deviation d.
