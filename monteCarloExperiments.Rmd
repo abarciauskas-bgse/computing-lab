@@ -1,0 +1,34 @@
+---
+title: "Computing Lab: Monte Carlo Experiments"
+output: html_document
+---
+
+```{r}
+# FIXME: This expects x and y to have the same number of items.
+# Test that x and y have the same mean.
+wald.test <- function(x, y, alpha) {
+  N <- length(x)
+  # Throw an error if length(x) != length(y)
+  # Initialize differences vector
+  D <- rep(0, N)
+  
+  for (i in 0:N) {
+    D[i] = y[i] - x[i]
+  }
+  
+  sdD <- sd(D)
+  
+  se <- sdD / sqrt(N)
+  dBar <- sum(D) / N
+  stat <- dBar / se
+  zScore <- qnorm(p = 1 - alpha/2)
+  reject <- if (abs(stat) > zScore) TRUE else FALSE
+  # A p-value is the probability of an observed (or more extreme) result,
+  #   assuming that the null hypothesis is true
+  pval <- 2*pnorm(-abs(zScore))
+  list(stat, pval, toString(reject))
+}
+
+wald.test(rnorm(1000, mean = 0, sd = 0.001), rnorm(1000, mean = 0, sd = 0.001), 0.05)
+```
+
