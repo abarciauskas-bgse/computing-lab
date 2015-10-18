@@ -1,3 +1,6 @@
+
+# BEGIN CODE
+
 # `wald.test(y, x, alpha)`
 # Performs the Wald Test for H0: mx - my = 0, H1: mx < my
 #
@@ -24,33 +27,12 @@ wald.test <- function(y, x, alpha) {
   # pval of stat
   # This would be qnorm(1 - stat/2) if we were interested in a 2-tailed test
   pval <- dnorm(stat)
-  # pval of alpha (e.g. size)
+  # pval of alpha
   alpha_stat <- qnorm(1 - alpha)
   # Reject H0 if stat > alpha_pval
   reject <- stat < -alpha_stat
   list(stat, pval, reject)
 }
-
-# # Test
-
-# alpha <- 0.05
-# ntests <- 1000
-# sample_sizes <- seq(5,300,5)
-# reject <- matrix(nrow = ntests, ncol = length(sample_sizes))
-# dimnames(reject)[[2]] <- sprintf('sample size = %d', sample_sizes)
-
-# for (s in 1:length(sample_sizes)) {
-#   for (n in 1:ntests) {
-#     cat('.')
-#     x <- 1 + rt(sample_sizes[s], 2.5)
-#     y <- 1 + rt(sample_sizes[s], 2.5)
-#     test_result <- wald.test(y, x, alpha)
-#     reject[n,s] <- test_result[3][[1]]
-#   }
-#   cat('\n')
-# }
-
-# plot(sample_sizes,colMeans(reject*100),t='b',ylim=c(0,10),lwd=2,col='darkblue',ylab='Test Size',xlab='Sample Size')
 
 
 # `mann.whitney.test(y, x, alpha)`
@@ -81,34 +63,14 @@ mann.whitney.test <- function(y, x, alpha) {
 
   stat <- (U - mU) / sdU
   pval <- dnorm(stat)
-  # If the alternative is the one-sided hypothesis that the location of
+  alpha_stat <- qnorm(1 - alpha)
+  # If the alternative is the one-sided hypothesis than the location of
   #   population 1 is higher than that of population 2, the decision rule is
   #   reject H0 when stat < -z(alpha).
-  reject <- stat < -(qnorm(1 - alpha))
+  reject <- stat < -alpha_stat
 
   list(stat, pval, reject)
 }
-
-# # Test
-
-# alpha <- 0.05
-# ntests <- 1000
-# sample_sizes <- seq(5,300,5)
-# reject <- matrix(nrow = ntests, ncol = length(sample_sizes))
-# dimnames(reject)[[2]] <- sprintf('sample size = %d', sample_sizes)
-
-# for (s in 1:length(sample_sizes)) {
-#   for (n in 1:ntests) {
-#     cat('.')
-#     x <- 1 + rt(sample_sizes[s], 2.5)
-#     y <- 1 + rt(sample_sizes[s], 2.5)
-#     test_result <- mann.whitney.test(y, x, alpha)
-#     reject[n,s] <- test_result[3][[1]]
-#   }
-#   cat('\n')
-# }
-
-# plot(sample_sizes,colMeans(reject*100),t='b',ylim=c(0,10),lwd=2,col='darkblue',ylab='Test Size',xlab='Sample Size')
 
 # `mc.test.size(test, alpha, S, N)`
 #
@@ -139,11 +101,10 @@ mc.test.size <- function(test, alpha, S, N) {
     for (sim in 1:S) {
       first_sample_size <- ni1[row]
       second_sample_size <- ni2[row]
-      # REVIEW: SHOULD THIS BE 1 + ...?
       first_sample <- rt(first_sample_size, 2.1)
       second_sample <- rt(second_sample_size, 2.1)
       test_results <- test(first_sample, second_sample, alpha)
-      test_sizes_for_row[sim] <- test_results[2][[1]]
+      test_sizes_for_row[sim] <- test_results[3][[1]]
     }
     test_sizes[row] <- mean(test_sizes_for_row)
     cat('\n')
@@ -152,16 +113,15 @@ mc.test.size <- function(test, alpha, S, N) {
   test_sizes
 }
 
-N <- matrix(c(4,5,6,7,8,9,10,11,20,21,500,520), 6, 2)
-(wt.size <- mc.test.size(wald.test, 0.1, 20000, N))
-(mwt.size <- mc.test.size(mann.whitney.test, 0.1, 20000, N))
+# N <- matrix(c(4,5,6,7,8,9,10,11,20,21,500,520), 6, 2)
+# (wt.size <- mc.test.size(wald.test, 0.1, 20000, N))
+# (mwt.size <- mc.test.size(mann.whitney.test, 0.1, 20000, N))
 
-# FIXME: This should be ylim=c(0,0.20) so something is wrong
-plot(wt.size, t='l', col='darkred', lwd=2, ylim=c(0,0.30))
-grid()
-lines(mwt.size, t='l', col='darkblue', lwd=2 )
-lines(rep(0.1, nrow(N)), col='black', lwd=1 )
-legend("topright", c('wald','mann-whitney'), col=c('darkred','darkblue'), lty=1)
+# plot(wt.size, t='l', col='darkred', lwd=2, ylim=c(0,0.20))
+# grid()
+# lines(mwt.size, t='l', col='darkblue', lwd=2 )
+# lines(rep(0.1, nrow(N)), col='black', lwd=1 )
+# legend("topright", c('wald','mann-whitney'), col=c('darkred','darkblue'), lty=1)
 
 # `mc.test.power(test, alpha, S, N, delta)`
 #
@@ -188,10 +148,16 @@ mc.test.power <- function(test, alpha, S, N, delta) {
   powers <- rep(0, length(delta))
 
   for (first_sample_mean_index in 1:length(delta)) {
-    first_sample <- delta[first_sample_mean_index] + rt(first_sample_size, 2.1)
-    second_sample <- 0 + rt(second_sample_size, 2.1)
-    test_results <- test(first_sample, second_sample, alpha)
-    powers[first_sample_mean_index] <- test_results[2][[1]]
+    cat('.')
+    test_powers_for_row <- rep(0, S)
+    for (sim in 1:S) {
+      first_sample <- delta[first_sample_mean_index] + rt(first_sample_size, 2.1)
+      second_sample <- 0 + rt(second_sample_size, 2.1)
+      test_results <- test(first_sample, second_sample, alpha)
+      test_powers_for_row[sim] <- test_results[3][[1]]
+    }
+    powers[first_sample_mean_index] <- mean(test_powers_for_row)
+    cat('\n')
   }
 
   powers
@@ -205,3 +171,5 @@ grid()
 lines(delta, mwt.power, t='l', col='darkblue', lwd=2)
 
 legend("bottomright", c('wald','mann-whitney') , col=c('darkred','darkblue'), lty=1)
+
+# END CODE
