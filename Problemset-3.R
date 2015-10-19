@@ -1,4 +1,4 @@
-# BEGIN CODE
+# Problemset 3: Numerical Methods for Data Science 
 #
 # `wald.test(y, x, alpha)`
 # Performs the Wald Test for H0: mx - my = 0, H1: mx < my
@@ -149,5 +149,3 @@ mc.test.power <- function(test, alpha, S, N, delta) {
 
   powers
 }
-
-# END CODE
