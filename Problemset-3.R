@@ -1,6 +1,3 @@
-
-# BEGIN CODE
-
 # `wald.test(y, x, alpha)`
 # Performs the Wald Test for H0: mx - my = 0, H1: mx < my
 #
