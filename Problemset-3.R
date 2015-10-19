@@ -1,3 +1,5 @@
+# BEGIN CODE
+#
 # `wald.test(y, x, alpha)`
 # Performs the Wald Test for H0: mx - my = 0, H1: mx < my
 #
@@ -23,14 +25,13 @@ wald.test <- function(y, x, alpha) {
   stat <- (mx - my - 0) / sqrt((var(x)/length(x)) + (var(y)/length(y)))
   # pval of stat
   # This would be qnorm(1 - stat/2) if we were interested in a 2-tailed test
-  pval <- dnorm(stat)
+  pval <- pnorm(stat)
   # pval of alpha
   alpha_stat <- qnorm(1 - alpha)
   # Reject H0 if stat > alpha_pval
   reject <- stat < -alpha_stat
   list(stat, pval, reject)
 }
-
 
 # `mann.whitney.test(y, x, alpha)`
 # Performs the Mann–Whitney Test for H0: mx - my = 0, H1: mx < my
@@ -59,7 +60,7 @@ mann.whitney.test <- function(y, x, alpha) {
   sdU <- sqrt(varU)
 
   stat <- (U - mU) / sdU
-  pval <- dnorm(stat)
+  pval <- pnorm(stat)
   alpha_stat <- qnorm(1 - alpha)
   # If the alternative is the one-sided hypothesis than the location of
   #   population 1 is higher than that of population 2, the decision rule is
@@ -85,7 +86,6 @@ mann.whitney.test <- function(y, x, alpha) {
 # The function returns a vector of size m containg the monte carlo estimate of the test size.
 # (The i–th element of the vector contains the size corresponding to row i of the N matrix)
 #
-# REVIEW: WHERE DO WE NEED S?
 mc.test.size <- function(test, alpha, S, N) {
   m <- nrow(N)
   ni1 <- N[,1]
@@ -109,16 +109,6 @@ mc.test.size <- function(test, alpha, S, N) {
 
   test_sizes
 }
-
-# N <- matrix(c(4,5,6,7,8,9,10,11,20,21,500,520), 6, 2)
-# (wt.size <- mc.test.size(wald.test, 0.1, 20000, N))
-# (mwt.size <- mc.test.size(mann.whitney.test, 0.1, 20000, N))
-
-# plot(wt.size, t='l', col='darkred', lwd=2, ylim=c(0,0.20))
-# grid()
-# lines(mwt.size, t='l', col='darkblue', lwd=2 )
-# lines(rep(0.1, nrow(N)), col='black', lwd=1 )
-# legend("topright", c('wald','mann-whitney'), col=c('darkred','darkblue'), lty=1)
 
 # `mc.test.power(test, alpha, S, N, delta)`
 #
@@ -159,14 +149,5 @@ mc.test.power <- function(test, alpha, S, N, delta) {
 
   powers
 }
-
-delta <- seq(0.0,5,0.05)
-(wt.power <- mc.test.power(wald.test, 0.10, 20000, c(10,13), delta))
-(mwt.power <- mc.test.power(mann.whitney.test, 0.10, 20000 , c(10,13), delta))
-plot(delta, wt.power, t='l', col='darkred', lwd=2 , ylim=c(0,1))
-grid()
-lines(delta, mwt.power, t='l', col='darkblue', lwd=2)
-
-legend("bottomright", c('wald','mann-whitney') , col=c('darkred','darkblue'), lty=1)
 
 # END CODE

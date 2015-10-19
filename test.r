@@ -1,30 +1,12 @@
-S <- 10000
-N <- 100
-delta <- seq(0,1,0.05)
-alpha <- 0.05
+# Test size
+#
+N <- matrix( c(4,5,6,7,8,9,10,11,20,21,500,520) , 6,2)
+wt.size <- mc.test.size( wald.test , 0.1 , 20000 , N )
+mwt.size <- mc.test.size( mann.whitney.test , 0.1 , 20000 , N )
+plot( wt.size , t='l', col='darkred' , lwd=2 , ylim=c(0,0.20))
+grid()
+lines( mwt.size , t='l', col='darkblue' , lwd=2 )
+lines( rep( 0.1 , nrow(N) ) , col='black' , lwd=1 )
+legend( "topright", c('wald','mann-whitney') , col=c('darkred','darkblue') , lty=1 )
 
-# monte carlo experiments
-reject <- matrix(0,S,length(delta))
-dimnames(reject)[[2]] <- sprintf('delta=%2.2f',delta)
-
-for( i in 1:length(delta) ){
-  for( s in 1:S ){
-    cat('.')
-
-    X <- 1+rt(N,2.5)
-    Y <- 1+delta[i]+rt(N,2.5)
-
-    d <- X-Y
-    stat <- mean(d)/(sd(d)/sqrt(N))
-    reject[s,i] <- (abs(stat) > qnorm(1-alpha/2))
-
-  }
-  cat('\n')
-}
-cat('Power of the test')
-colMeans(reject*100)
-plot(delta,colMeans(reject*100),t='b',ylim=c(0,100),lwd=2,col='darkblue',ylab='Test Power',xlab='Violation of Null')
-abline(h=5,col='red',lwd=2)
-
-D <- cbind(delta,colMeans(reject*100))
-write.table(file='wald-power.csv',D,col.names=FALSE,row.names=FALSE)
+# Test power
