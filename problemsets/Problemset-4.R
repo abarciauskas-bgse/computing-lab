@@ -19,4 +19,19 @@ my.chol <- function(A) {
   L
 }
 
-my.chol(Sigma)
+# `my.forward.solve` solves the linear system of equations Lx = b
+#
+# The function requires the arguments (in this order):
+#   1) `L`: the matrix L,
+#   2) `b`: the vector b
+#
+# The function returns the vector x
+my.forward.solve <- function(L, b) {
+  x <- rep(0, length(b))
+  for (i in 1:length(x)) {
+    x[i] <- (1/L[i,i]) * (b[i] - sum(L[i,1:(i-1)] * x[1:(i-1)]))
+  }
+  x
+}
+
+my.forward.solve(L,b)
