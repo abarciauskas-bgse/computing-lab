@@ -25,13 +25,50 @@ my.chol <- function(A) {
 #   1) `L`: the matrix L,
 #   2) `b`: the vector b
 #
-# The function returns the vector x
+# The function returns the vector x.
+#
 my.forward.solve <- function(L, b) {
   x <- rep(0, length(b))
   for (i in 1:length(x)) {
     x[i] <- (1/L[i,i]) * (b[i] - sum(L[i,1:(i-1)] * x[1:(i-1)]))
   }
-  x
+  return(x = x)
 }
 
-my.forward.solve(L,b)
+# `my.back.solve` solves the linear system of equations Ux = b
+#
+# The function requires the arguments (in this order):
+#   1) `U`: the matrix U,
+#   2) `b`: the vector b
+#
+# The function returns the vector x.
+#
+my.back.solve <- function(U, b) {
+  x <- rep(0, length(b))
+  n <- length(x)
+  i <- n
+  while (i > 0) {
+    sum_of_products <- 0
+    if (i < n) { sum_of_products <- sum(U[i,(i+1):n] * x[(i+1):n]) }
+    x[i] <- (b[i] - sum_of_products) / U[i,i]
+    i <- i - 1
+  }
+  return(x = x)
+}
+
+# `my.solve` solves th linear system of equations Ax = b, # where A ∈ Rn×n is
+#   a symmetric positive definite matrix, b ∈ Rn. The function has to use the
+#   my.chol, my.forward.solve and my.back.solve.
+#
+# The function requires the arguments (in this order):
+#   1) `A`: the matrix A, and
+#   2) `b`: the vector b
+#
+# The function returns the vector x
+#
+my.solve <- function(A, b) {
+  L <- my.chol(A)
+  y <- my.forward.solve(L, b)
+  x <- my.back.solve(t(L), y)
+  return(x = x)
+}
