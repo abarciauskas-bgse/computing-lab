@@ -8,8 +8,9 @@ my.chol <- function(A) {
   for (i in 1:nrow(L)) {
     for (j in 1:ncol(L)) {
       if (i > j) {
-        sum_of_products <- sum(sapply(L[i,1:(j-1)], `*`, L[j,1:(j-1)]))
-        L[i,j] <- (1/L[j,j]) * (A[i,j] - sum_of_products)
+        products <- c(0)
+        for (k in 1:(j-1)) products <- append(products, L[j,k] * L[i,k])
+        L[i,j] <- (1/L[j,j]) * (A[i,j] - sum(products))
       } else if (i == j) {
         sum_of_squares <- sum(sapply(L[i,1:(i-1)], `^`, 2))
         L[i,i] <- sqrt(A[i,i] - sum_of_squares)
@@ -72,3 +73,40 @@ my.solve <- function(A, b) {
   x <- my.back.solve(t(L), y)
   return(x = x)
 }
+
+
+# TEST #
+
+# generate_matrix <- function(n) {
+#   ev = runif(n, 0, 10)
+#   Z <- matrix(ncol=n, rnorm(n^2))
+#   decomp <- qr(Z)
+#   Q <- qr.Q(decomp)
+#   R <- qr.R(decomp)
+#   d <- diag(R)
+#   ph <- d / abs(d)
+#   O <- Q %*% diag(ph)
+#   Z <- t(O) %*% diag(ev) %*% O
+#   Z
+# }
+
+# test <- function(n)
+# {
+#   A <- generate_matrix(n)
+#   print ("A")
+#   print (A)
+  
+#   b <- rnorm(n, 1, 10)
+#   print("b")
+#   print(b)
+  
+#   my.x <- my.solve(A, b)
+#   r.x <- solve(A, b)
+#   print("x")
+#   print(cbind(my.x,r.x))
+
+#   print("Ax")
+#   print(cbind(A%*%my.x, A%*%r.x))
+# }
+
+# test(4)
