@@ -77,19 +77,39 @@ my.solve <- function(A, b) {
 
 # TEST #
 
-# generate_matrix <- function(n) {
-#   ev = runif(n, 0, 10)
-#   Z <- matrix(ncol=n, rnorm(n^2))
-#   decomp <- qr(Z)
-#   Q <- qr.Q(decomp)
-#   R <- qr.R(decomp)
-#   d <- diag(R)
-#   ph <- d / abs(d)
-#   O <- Q %*% diag(ph)
-#   Z <- t(O) %*% diag(ev) %*% O
-#   Z
+generate_matrix <- function(n) {
+  ev = runif(n, 0, 10)
+  Z <- matrix(ncol=n, rnorm(n^2))
+  decomp <- qr(Z)
+  Q <- qr.Q(decomp)
+  R <- qr.R(decomp)
+  d <- diag(R)
+  ph <- d / abs(d)
+  O <- Q %*% diag(ph)
+  Z <- t(O) %*% diag(ev) %*% O
+  Z
+}
+
+# n <- seq(5,50,5)
+# results_matrix <- matrix(0, nrow = length(n), ncol = 3)
+# vars_colname <- 'system of N vars'
+# smart_colname <- 'time elapsed for solve(A,b)'
+# dumb_colname <- 'time elapsed for solve(A)%*%b'
+# colnames(results_matrix) <- c(vars_colname, smart_colname, dumb_colname)
+
+# for (i in 1:length(n)) {
+#   cat('.')
+#   matrix_dim <- n[i]
+#   A <- generate_matrix(matrix_dim)
+#   b <- rnorm(matrix_dim, 1, 10)
+
+#   results_matrix[i, vars_colname] <- matrix_dim
+#   results_matrix[i, smart_colname] <- system.time(replicate(10000, solve(A,b)))['elapsed']
+#   results_matrix[i, dumb_colname] <- system.time(replicate(10000, solve(A)%*%b))['elapsed']
 # }
 
+# plot(results_matrix[,vars_colname], results_matrix[,dumb_colname], col = 'dodgerblue3', type = 'l')
+# points(results_matrix[,vars_colname], results_matrix[,smart_colname], col = 'darkgoldenrod')
 # test <- function(n)
 # {
 #   A <- generate_matrix(n)
