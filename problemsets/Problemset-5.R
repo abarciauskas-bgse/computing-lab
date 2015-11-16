@@ -50,7 +50,7 @@ lasso.reg <- function(y, X, lambda) {
 
   # Do until convergence
   for (iter in 1:max.iter) {
-    for (k in 1:P)
+    for (k in 1:P) {
       # c
       y.minus_k <- y - X[,setdiff(1:P,k)] %*% beta[setdiff(1:P,k)]
       x.k <- X[,k]
@@ -58,12 +58,12 @@ lasso.reg <- function(y, X, lambda) {
       var <- sum(x.k * x.k)
 
       beta.k.ls <- cov/var
-      beta[k] <- sign(beta.k.ls)*max( c( abs(beta.k.ls) - lambda/(2*var) , 0 ) )
+      beta[k] <- sign(beta.k.ls)*max(c( abs(beta.k.ls) - lambda/(2*var), 0 ))
       # cov/var ~ least squares kth coefficient
       # beta[i] <- soft.threshold(cov/var , lambda/(2*var))
-      if (sum((beta - beta.prev)**2) < 1e-6) { return(beta) }
-
-      beta.prev <- beta
+    }
+    if (sum((beta - beta.prev)**2) < 1e-6) { return(beta) }
+    beta.prev <- beta
   }
 
   beta
@@ -96,18 +96,19 @@ cross.validation <- function(y, X, lambda, pen.reg) {
   nobs <- length(y)
   test_size <- floor(nobs/nsubsamples)
   list_of_rss <- c()
-  
-  # FIXME this offsetting is off
+
+  # FIXME: offsetting is off
   for (i in 1:nsubsamples) {
-    pointer <- nobs-i*test_size
+    start_pointer <- nobs-i*test_size
+    end_pointer <- start_pointer + test_size
     if (pointer == 0) pointer <- 1
    
-    y_train <- c(y[1:(pointer-1)], y[(test_size + pointer):nobs])
     # although unused
-    X_train <- rbind(X[1:(pointer-1),], X[(test_size + pointer):nobs,])
+    y_train <- y[setdiff(1:nobs,(start_pointer + 1):(end_pointer))]
+    X_train <- X[setdiff(1:nobs,(start_pointer + 1):(end_pointer)),]
 
-    y_test <- y[pointer:(test_size + pointer - 1)]
-    X_test <- X[pointer:(test_size + pointer - 1),]
+    y_test <- y[(start_pointer + 1):(end_pointer)]
+    X_test <- X[(start_pointer + 1):(end_pointer),]
 
     # Estimate beta from 4 subsamples
     beta.pen <- pen.reg(y_train, X_train, lambda)
@@ -116,3 +117,5 @@ cross.validation <- function(y, X, lambda, pen.reg) {
   }
   mean(list_of_rss)
 }
+
+cross.validation(y,X,0.1,lasso.reg)

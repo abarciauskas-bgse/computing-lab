@@ -24,7 +24,7 @@ lambda.range <- seq(0,5,0.5)
 beta.trace <- matrix(0,length(lambda.range),P) 
 
 for( l in 1:length(lambda.range) ){ 
-  beta.trace[l,] <- lasso.reg( y , X , lambda.range[l]*T ) 
+  beta.trace[l,] <- lasso.reg( y , X , 100 ) 
 } 
 
 matplot(lambda.range,beta.trace,t='b')
