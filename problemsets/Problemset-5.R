@@ -51,16 +51,13 @@ lasso.reg <- function(y, X, lambda) {
   # Do until convergence
   for (iter in 1:max.iter) {
     for (k in 1:P) {
-      # c
       y.minus_k <- y - X[,setdiff(1:P,k)] %*% beta[setdiff(1:P,k)]
       x.k <- X[,k]
       cov <- sum(y.minus_k * x.k)
       var <- sum(x.k * x.k)
 
       beta.k.ls <- cov/var
-      beta[k] <- sign(beta.k.ls)*max(c( abs(beta.k.ls) - lambda/(2*var), 0 ))
-      # cov/var ~ least squares kth coefficient
-      # beta[i] <- soft.threshold(cov/var , lambda/(2*var))
+      beta[k] <- sign(beta.k.ls)*max(c(abs(beta.k.ls) - lambda/(2*var), 0))
     }
     if (sum((beta - beta.prev)**2) < 1e-6) { return(beta) }
     beta.prev <- beta
@@ -101,7 +98,6 @@ cross.validation <- function(y, X, lambda, pen.reg) {
   for (i in 1:nsubsamples) {
     start_pointer <- nobs-i*test_size
     end_pointer <- start_pointer + test_size
-    if (pointer == 0) pointer <- 1
    
     # although unused
     y_train <- y[setdiff(1:nobs,(start_pointer + 1):(end_pointer))]
@@ -117,5 +113,3 @@ cross.validation <- function(y, X, lambda, pen.reg) {
   }
   mean(list_of_rss)
 }
-
-cross.validation(y,X,0.1,lasso.reg)
